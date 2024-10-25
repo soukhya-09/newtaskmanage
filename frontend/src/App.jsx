@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const App = () => {
   const [tasks,setTasks]=useState([])
   const [data,setdata] = useState({title:"",description:""})
+  const [updateid,setid] = useState(null);
 const [newdata,setnewdata] = useState({ntitle:"",ndescription:""})
    function onchangehandler(e){
     setdata({
@@ -16,10 +17,10 @@ const [newdata,setnewdata] = useState({ntitle:"",ndescription:""})
    }
    function onchangehandlernew(e){
     setnewdata({
-      ...data,
+      ...newdata,
        [e.target.name]:e.target.value
     })
-    
+   
    }
   
 
@@ -28,7 +29,7 @@ const [newdata,setnewdata] = useState({ntitle:"",ndescription:""})
     .then(response=>setTasks(response.data))
     .catch(error=>console.error(error))
   },[])
-  console.log(tasks);
+  
   const addTask=()=>{
     axios.post('http://localhost:5000/api/tasks/addtask',{title:data.title,description:data.description},{withCredentials:true})
     .then(response=>{
@@ -38,11 +39,13 @@ const [newdata,setnewdata] = useState({ntitle:"",ndescription:""})
    
     )
     .catch(error=>console.error(error))
-    console.log(tasks);
+    
   }
   const updatetask = (id) => {
+    console.log(id);
+
     axios.put(
-        `http://localhost:5000/api/tasks/updatetask/${id}`, // Include taskId in the URL
+        `http://localhost:5000/api/tasks/updatetask/${id}`, 
         { title: newdata.ntitle, description: newdata.ndescription },
         { withCredentials: true }
     )
@@ -53,6 +56,7 @@ const [newdata,setnewdata] = useState({ntitle:"",ndescription:""})
         // Clear the input fields
         toast.success("updated successfully")
        setnewdata({ntitle:"",ndescription:""})
+       setid(null)
     })
     .catch(error => console.error(error));
 };
@@ -89,20 +93,34 @@ const [newdata,setnewdata] = useState({ntitle:"",ndescription:""})
             <button className='bg-red-500 text-white p-3 rounded' onClick={()=>deleteTask(task._id)}>Delete</button>
             <div>
       {/* You can open the modal using document.getElementById('ID').showModal() method */}
-<button className="btn bg-green-500 text-white" onClick={()=>document.getElementById('my_modal_4').showModal()}>Edit</button>
+<button className=" bg-green-500 text-white p-3 rounded " onClick={()=>{{document.getElementById('my_modal_4').showModal()}
+setid(task._id)
+console.log(task._id);
+}
+
+}>Edit</button>
 <dialog id="my_modal_4" className="modal">
-  <div className="modal-box w-11/12 max-w-5xl">
+  <div className="modal-box w-[80%] max-w-5xl p-5">
     <h3 className="font-bold text-lg">Edit !</h3>
-    <input className='border p-2 w-full mb-4' name='ntitle'  type='text' value={newdata.ntitle} onChange={onchangehandlernew} placeholder='Enter New Task Title'/>
-    <input className='border p-2 w-full mb-4' name='ndescription' onChange={onchangehandlernew} value={newdata.ndescription}  type='text' placeholder='Enter New Task Description'/>
-    <div className="modal-action">
+    <input className='border p-2 w-full border-black mb-4' name='ntitle'  type='text' value={newdata.ntitle} 
+    
+    onChange={onchangehandlernew} placeholder='Enter New Task Title'/>
+    <input className='border p-2 w-full border-black mb-4' name='ndescription' onChange={onchangehandlernew} 
+    value={newdata.ndescription}  type='text' placeholder='Enter New Task Description'/>
+    <div className="modal-action flex justify-between">
       
-        {/* if there is a button, it will close the modal */}
-        <button onClick={()=>{updatetask(task._id)
+        
+        <button onClick={()=>{updatetask(updateid)
         document.getElementById('my_modal_4').close()
-        }} className="btn bg-emerald-400 text-white">Save</button>
-      
+        }} className=" bg-green-500 text-white p-3 rounded">Save</button>
+       <div>
+    <form method="dialog" className="modal-backdrop">
+    <button className=" bg-slate-400 text-white p-3 rounded">close</button>
+  </form>
     </div>
+    </div>
+   
+    
   </div>
 </dialog>
     </div>
